@@ -90,7 +90,7 @@ def make_optimizer_and_schedule(args, model, checkpoint, lr, step_lr):
         schedule = lr_scheduler.LambdaLR(optimizer, lr_func)
 
     # Fast-forward the optimizer and the scheduler if resuming
-    if checkpoint and not args.task == 'train-classifier':
+    if checkpoint and args.task not in ['train-classifier', 'estimate-mi']:
         optimizer.load_state_dict(checkpoint['optimizer'])
         try:
             schedule.load_state_dict(checkpoint['schedule'])
@@ -267,7 +267,7 @@ def train_model(args, atm, loaders, *, checkpoint=None, store=None):
             schedules.append(schedule)
 
     best_prec1, best_loss, start_epoch = (0, float('inf'), 0)
-    if checkpoint and not args.task == 'train-classifier':
+    if checkpoint and args.task not in ['train-classifier', 'estimate-mi']:
         start_epoch = checkpoint['epoch']
         best_prec1 = checkpoint[f"{'adv' if args.adv_train else 'nat'}_prec1"]
 
